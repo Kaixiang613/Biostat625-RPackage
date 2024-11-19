@@ -1,0 +1,158 @@
+---
+title: "linear_model_tutorial"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{linear_model_tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+The `LinearRegression` package provides a simplified implementation of linear regression with built-in statistical summaries and visualization tools. This vignette will demonstrate:
+
+1.  How to use the `LinearRegression` package.
+
+2.  Comparisons against R's native `lm()` function in terms of correctness and efficiency.
+
+Additionally, the package offers visualization tools for residuals and fitted lines.
+
+In this tutorial, we will:
+
+1.  Fit a linear regression model.
+
+2.  Interpret model outputs.
+
+3.  Diagnose the model using residual plots.
+
+4.  Visualize the fitted line.
+
+# Usage of `LinearRegression`
+
+## Simulated Data
+
+We begin by generating a simple dataset:
+
+``` r
+# Simulated dataset
+set.seed(123)
+X <- matrix(runif(100, 1, 10), ncol = 1)
+y <- 5 + 2 * X + rnorm(100, sd = 1)
+
+# Display the first few rows
+head(cbind(X, y))
+```
+
+## Fitting a Linear Regression Model
+
+We use `linear_model_custom` to fit a linear regression model:
+
+``` r
+# Fit the model
+model <- linear_model_custom(X, y)
+
+# Display model results
+print(model)
+```
+
+**Output Explanation**:
+
+-   `coefficients`: Estimated intercept and slope.
+
+-   `r_squared`: Proportion of variance explained by the model.
+
+-   `adjusted_r_squared`: Adjusted for the number of predictors.
+
+-   `t_values` and `p_values`: Significance of the coefficients.
+
+## Visualization Tools
+
+### Residual Plot
+
+We use `plot_residuals` to assess the residuals of the fitted model:
+
+``` r
+# Residual plot
+plot_residuals(model$fitted_values, model$residuals)
+```
+
+### Fitted Line Plot
+
+We use `plot_fitted_line` to visualize the fitted line:
+
+``` r
+# Fitted line plot
+plot_fitted_line(X, y, model$fitted_values)
+```
+
+# Comparison with R's `lm()` Function
+
+## Correctness Comparison
+
+We compare the outputs of `linear_model_custom` and `lm()` using `all.equal()` to verify their correctness:
+
+``` r
+# Fit the model with lm()
+lm_model <- lm(y ~ X)
+
+# Compare coefficients
+all.equal(as.vector(model$coefficients), coef(lm_model))
+
+# Compare fitted values
+all.equal(as.vector(model$fitted_values), fitted(lm_model))
+
+# Compare residuals
+all.equal(as.vector(model$residuals), residuals(lm_model))
+```
+
+If the outputs are correct, `all.equal()` will return `TRUE`.
+
+## Efficiency Comparison
+
+We compare the computational efficiency of `linear_model_custom` and `lm()` using `bench::mark`:
+
+``` r
+# Benchmark the two methods
+bench::mark(
+  LinearRegression = linear_model_custom(X, y),
+  lm = lm(y ~ X)
+)
+```
+
+The benchmarking results will display execution time and memory usage for both methods.
+
+# Real Dataset Example: `mtcars`
+
+We demonstrate the usage of `LinearRegression` with the real-world `mtcars` dataset:
+
+``` r
+# Load the dataset
+data(mtcars)
+
+# Predictors and response
+X_real <- as.matrix(mtcars[, "wt", drop = FALSE])
+y_real <- mtcars$mpg
+
+# Fit the model
+model_real <- linear_model_custom(X_real, y_real)
+
+# Display results
+print(model_real)
+
+# Visualization
+plot_residuals(model_real$fitted_values, model_real$residuals)
+plot_fitted_line(X_real, y_real, model_real$fitted_values)
+```
+
+# Summary
+
+The `LinearRegression` package provides a simple and efficient way to perform linear regression while offering built-in diagnostic tools. It achieves correctness comparable to R's `lm()` function and performs efficiently, making it ideal for lightweight regression tasks and educational purposes.
+
+For more advanced tasks, users may consider traditional tools like `lm()` or modern frameworks such as `glmnet`.

@@ -1,0 +1,15 @@
+Package: LinearRegression
+Title: Linear Regression with Custom Statistics
+Version: 0.1.0
+Authors@R: person(Kaixiang Jiao, email = kxjiao@umich.edu, role = c("aut", "cre"))
+Description: Implements a custom linear regression model with detailed statistics like R-squared, Adjusted R-squared, t-tests, and p-values.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.2
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+VignetteBuilder: knitr
